@@ -1,0 +1,14 @@
+steps:
+  - name: gradle:7.4.2-jdk17
+    entrypoint: gradle
+    args: ["assemble"]
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "us-docker.pkg.dev/$PROJECT_ID/gcr.io/springbootgcp:$COMMIT_SHA", "--build-arg=JAR_FILE=build/libs/springbootgcp-0.0.1-SNAPSHOT.jar", "."]
+  - name: gcr.io/cloud-builders/docker
+    args: [ "push", "us-docker.pkg.dev/$PROJECT_ID/gcr.io/springbootgcp:$COMMIT_SHA" ]
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: ['run', 'deploy', 'springbootgcpcr', '--image',  "us-docker.pkg.dev/$PROJECT_ID/gcr.io/springbootgcp:$COMMIT_SHA" , '--allow-unauthenticated','--port=8080','--region', 'us-central1' ,'--set-secrets=--jdbc.user=jdbcuser:latest,  --jdbc.password=jdbcpassword:latest, --jdbc.url=jdbcurl:latest']
+timeout: "1600s"
+options:
+  logging: CLOUD_LOGGING_ONLY

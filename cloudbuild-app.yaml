@@ -1,0 +1,16 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args: [ '-c', "gcloud secrets versions access latest --secret=appprop >  src/main/resources/application.properties" ]
+  - name: gradle:7.4.2-jdk17
+    entrypoint: gradle
+    args: [ "assemble" ]
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: bash
+    args: ['-c', 'mkdir appdeploy && cp  /workspace/app.yaml /workspace/appdeploy/ && cp /workspace/build/libs/springbootgcp-0.0.1-SNAPSHOT.jar /workspace/appdeploy/app.jar ' ]
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: gcloud
+    args: ['app', 'deploy','./appdeploy/app.yaml' ]
+timeout: "1600s"
+options:
+  logging: CLOUD_LOGGING_ONLY

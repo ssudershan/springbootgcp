@@ -1,0 +1,4 @@
+runtime: java17
+entrypoint: java -jar app.jar
+vpc_access_connector:
+  name: projects/propane-cooler-354222/locations/us-central1/connectors/my-vpc-serverlessconnecto
